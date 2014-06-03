@@ -23,7 +23,6 @@ intersect (Ray o d) (Sphere ce r) = let
               let p2 = o + (mul t2 d)
               in Just(p2, p2 - ce)
             else Nothing
-
 intersect (Ray o d) (Plan p n) =
   if (dot d n == 0) then Nothing
   else let t = (1/(dot d n)) * (dot (p-o) n)
