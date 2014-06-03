@@ -1,5 +1,7 @@
 module Vector where
 
+import Graphics.GD
+
 type Vec3Di =  (Int, Int, Int)
 data Vec3Df = Vec3Df Float Float Float
               deriving Show
@@ -30,3 +32,11 @@ norm = sqrt.squaredNorm
 normalize :: Vec3Df -> Vec3Df
 normalize v = if (norm v == 0) then v
               else mul (1/(norm v)) v
+
+
+toVec3Df :: Color -> Vec3Df
+toVec3Df c  = let (r, g, b, _) = toRGBA c
+                  in Vec3Df (fromIntegral r) (fromIntegral g) (fromIntegral b)
+
+toColor :: Vec3Df -> Color
+toColor (Vec3Df r g b) = rgb (round r) (round g) (round b) 
