@@ -18,8 +18,8 @@ tanY :: Float
 tanY = tan (80 * pi/180)
 
 rayTrace :: Float -> Float -> Vec3Df -> Vec3Df -> Scene -> Point -> Color
-rayTrace h w rv uv ((Camera o t),objs) (x,y) = let stepX = mul ((intToFloat x - w/2)/w * (tanX h w)) rv
-                                                   stepY = mul ((intToFloat y - h/2)/h * tanY) uv
+rayTrace h w rv uv ((Camera o t),objs) (x,y) = let stepX = mul ((intToFloat x - h/2)/h * (tanX w h)) rv
+                                                   stepY = mul ((intToFloat y - w/2)/w * tanY) uv
                                       in let dir = t - o + stepX + stepY
                                          in brdf objs (Ray o (normalize dir)) 
 
