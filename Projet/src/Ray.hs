@@ -7,7 +7,7 @@ import Scene
 data Ray = Ray Vec3Df Vec3Df
            deriving Show
 
-intersect :: Ray -> Sphere -> Maybe (Vec3Df, Vec3Df)
+intersect :: Ray -> Object -> Maybe (Vec3Df, Vec3Df)
 intersect (Ray o d) (Sphere ce r) = let
   a = squaredNorm d
   b = dot d (o-ce)
@@ -24,10 +24,9 @@ intersect (Ray o d) (Sphere ce r) = let
               in Just(p2, p2 - ce)
             else Nothing
 
-
-intersect' :: Ray -> Plan -> Maybe (Vec3Df, Vec3Df)
-intersect' (Ray o d) (Plan p n) =
+intersect (Ray o d) (Plan p n) =
   if (dot d n == 0) then Nothing
   else let t = (1/(dot d n)) * (dot (p-o) n)
        in if (t < 0) then Nothing
           else Just(o + mul t d, n )
+

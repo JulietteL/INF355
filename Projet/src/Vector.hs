@@ -26,3 +26,7 @@ squaredNorm v = dot v v
 
 norm :: Vec3Df -> Float
 norm = sqrt.squaredNorm
+
+normalize :: Vec3Df -> Vec3Df
+normalize v = if (norm v == 0) then v
+              else mul (1/(norm v)) v
