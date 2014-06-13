@@ -1,17 +1,15 @@
 module RayTracer where
 
-import Data.Maybe
-import Data.Ord
-import Data.List hiding (intersect)
 import Graphics.GD
 import Vector
 import Scene
 import Ray
 import Scene
+import Brdf
 
 createScene :: Scene
 createScene = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
-                  objs = [Sphere (Vec3Df 0 0 0) 1]
+                  objs = [Sphere (Vec3Df 0 0 0) 1 ( Material (Vec3Df 255 0 0)), Plan (Vec3Df 0 0 1) (Vec3Df 0 0 1) (Material (Vec3Df 0 255 0)), Sphere (Vec3Df 0 (-0.5) (-0.5)) 0.7 (Material (Vec3Df 0 0 255))]
                   in (cam, objs)
 
 tanX :: Float -> Float -> Float
@@ -43,15 +41,6 @@ toVec3Df :: Color -> Vec3Df
 toVec3Df c  = let (r, g, b, _) = toRGBA c
                   in Vec3Df (fromIntegral r) (fromIntegral g) (fromIntegral b)
                      
-sqDistanceToCam :: Vec3Df -> (Vec3Df , Vec3Df) -> Float
-sqDistanceToCam cam (point,normal) = squaredNorm $ point - cam
-
-brdf :: [Object] -> Ray -> Color
-brdf objs (Ray o d) = let intList = catMaybes [intersect (Ray o d) obj | obj <- objs ]
-                      in if null intList
-                         then rgb 0 0 0
-                         else toColor $ fst $ maximumBy (comparing (sqDistanceToCam o)) intList
-
 -- h : height, w : width of the image
 main :: Int -> Int -> IO()
 main h w = do
