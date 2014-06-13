@@ -1,6 +1,8 @@
 module RayTracer where
 
 import Data.Maybe
+import Data.Ord
+import Data.List hiding (intersect)
 import Graphics.GD
 import Vector
 import Scene
@@ -40,10 +42,16 @@ setPixels (p:t) f im = do
 toVec3Df :: Color -> Vec3Df
 toVec3Df c  = let (r, g, b, _) = toRGBA c
                   in Vec3Df (fromIntegral r) (fromIntegral g) (fromIntegral b)
+                     
+sqDistanceToCam :: Vec3Df -> (Vec3Df , Vec3Df) -> Float
+sqDistanceToCam cam (point,normal) = squaredNorm $ point - cam
 
 brdf :: [Object] -> Ray -> Color
-brdf objs (Ray o d) = sum( fmap (\r -> if isJust r then rgb 255 255 255 else rgb 0 0 0 )[intersect (Ray o d) obj | obj <- objs ])
-  
+brdf objs (Ray o d) = let intList = catMaybes [intersect (Ray o d) obj | obj <- objs ]
+                      in if null intList
+                         then rgb 0 0 0
+                         else toColor $ fst $ maximumBy (comparing (sqDistanceToCam o)) intList
+
 -- h : height, w : width of the image
 main :: Int -> Int -> IO()
 main h w = do
