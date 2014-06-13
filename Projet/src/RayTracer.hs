@@ -1,6 +1,5 @@
 module RayTracer where
 
-import Data.Maybe
 import Graphics.GD
 import Vector
 import Scene
@@ -9,11 +8,13 @@ import Scene
 import Brdf
 
 createScene :: Scene
-createScene = let cam = Camera (Vec3Df 0 0 (-2)) (Vec3Df 0 0 0)
-                  objs = [Sphere (Vec3Df 0 0 0) 1 ( Material (Vec3Df 255 0 0))]
-                  lights = [Light (Vec3Df 0 0 (-2)) (Vec3Df 1 1 1)]
+createScene = let cam = Camera (Vec3Df 0 0 (-4)) (Vec3Df 0 0 0)
+                  objs = [Sphere (Vec3Df 0 0 0) 1 ( Material (Vec3Df 255 0 0)),
+                          Plan (Vec3Df 0 0 1) (Vec3Df 0 0 (-1)) (Material (Vec3Df 0 255 0)),
+                          Sphere (Vec3Df 0 (-0.5) (-0.5)) 0.7 (Material (Vec3Df 0 0 255))]
+                  lights = [Light (Vec3Df 0 4 (-4)) (Vec3Df 1 1 1)]
                   in (cam, objs, lights)
-
+                     
 tanX :: Float -> Float -> Float
 tanX h w = tan (80 * pi/180) * w/h 
 tanY :: Float
@@ -42,7 +43,7 @@ setPixels (p:t) f im = do
 toVec3Df :: Color -> Vec3Df
 toVec3Df c  = let (r, g, b, _) = toRGBA c
                   in Vec3Df (fromIntegral r) (fromIntegral g) (fromIntegral b)
-
+                     
 -- h : height, w : width of the image
 main :: Int -> Int -> IO()
 main h w = do
