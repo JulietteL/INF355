@@ -6,10 +6,11 @@ import Vector
 import Scene
 import Ray
 import Scene
+import Brdf
 
 createScene :: Scene
 createScene = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
-                  objs = [Sphere (Vec3Df 0 0 0) 1]
+                  objs = [Sphere (Vec3Df 0 0 0) 1 ( Material (Vec3Df 255 0 0))]
                   in (cam, objs)
 
 tanX :: Float -> Float -> Float
@@ -41,9 +42,6 @@ toVec3Df :: Color -> Vec3Df
 toVec3Df c  = let (r, g, b, _) = toRGBA c
                   in Vec3Df (fromIntegral r) (fromIntegral g) (fromIntegral b)
 
-brdf :: [Object] -> Ray -> Color
-brdf objs (Ray o d) = sum( fmap (\r -> if isJust r then rgb 255 255 255 else rgb 0 0 0 )[intersect (Ray o d) obj | obj <- objs ])
-  
 -- h : height, w : width of the image
 main :: Int -> Int -> IO()
 main h w = do
