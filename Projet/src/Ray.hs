@@ -21,11 +21,11 @@ intersect (Ray o d) (Sphere ce r _) = let
          in Just (p1, p1 - ce)
        else if (t2 < t1 && t2 > 0) then
               let p2 = o + (mul t2 d)
-              in Just(p2, p2 - ce)
+              in Just(p2, normalize $ p2 - ce)
             else Nothing
 intersect (Ray o d) (Plan p n _) =
   if (dot d n == 0) then Nothing
   else let t = (1/(dot d n)) * (dot (p-o) n)
        in if (t < 0) then Nothing
-          else Just(o + mul t d, n )
+          else Just(o + mul t d, normalize n )
 

@@ -9,9 +9,10 @@ import Scene
 import Brdf
 
 createScene :: Scene
-createScene = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
+createScene = let cam = Camera (Vec3Df 0 0 (-2)) (Vec3Df 0 0 0)
                   objs = [Sphere (Vec3Df 0 0 0) 1 ( Material (Vec3Df 255 0 0))]
-                  in (cam, objs)
+                  lights = [Light (Vec3Df 0 0 (-2)) (Vec3Df 1 1 1)]
+                  in (cam, objs, lights)
 
 tanX :: Float -> Float -> Float
 tanX h w = tan (80 * pi/180) * w/h 
@@ -19,10 +20,10 @@ tanY :: Float
 tanY = tan (80 * pi/180)
 
 rayTrace :: Float -> Float -> Vec3Df -> Vec3Df -> Scene -> Point -> Color
-rayTrace h w rv uv ((Camera o t),objs) (x,y) = let stepX = mul ((intToFloat x - h/2)/h * (tanX w h)) rv
-                                                   stepY = mul ((intToFloat y - w/2)/w * tanY) uv
+rayTrace h w rv uv ((Camera o t),objs, lights) (x,y) = let stepX = mul ((intToFloat x - h/2)/h * (tanX w h)) rv
+                                                           stepY = mul ((intToFloat y - w/2)/w * tanY) uv
                                       in let dir = t - o + stepX + stepY
-                                         in brdf objs (Ray o (normalize dir)) 
+                                         in brdf objs lights (Ray o (normalize dir)) 
 
 intToFloat :: Int -> Float
 intToFloat i = fromInteger $ toInteger i

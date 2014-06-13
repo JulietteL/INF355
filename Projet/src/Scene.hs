@@ -14,8 +14,10 @@ getMaterial :: Object -> Material
 getMaterial (Sphere _ _ mat) = mat
 getMaterial (Plan _ _ mat) = mat
 
+-- Lumière : position, couleur
+data Light = Light Vec3Df Vec3Df
 
-type Scene = (Camera, [Object])
+type Scene = (Camera, [Object], [Light])
 
 -- Material for object
 -- Material : diffuse color
