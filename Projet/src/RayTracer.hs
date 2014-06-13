@@ -37,8 +37,8 @@ getPixels h w = [(x,y) | x <- [0..h-1], y<- [0..w-1]]
 setPixels :: [Point] -> (Point -> Color) -> Image -> IO ()
 setPixels [] _ _ = return () 
 setPixels (p:t) f im = do
-  setPixel p (f p) im
-  setPixels t f im
+    setPixel p (f p) im
+    setPixels t f im
 
 toVec3Df :: Color -> Vec3Df
 toVec3Df c  = let (r, g, b, _) = toRGBA c
@@ -48,6 +48,6 @@ toVec3Df c  = let (r, g, b, _) = toRGBA c
 main :: Int -> Int -> IO()
 main h w = do
   im <- newImage (h,w)
-  setPixels (getPixels w h) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) createScene) im
+  setPixels (getPixels h w) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) createScene) im
   savePngFile "result.png" im
   return ()
