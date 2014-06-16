@@ -19,7 +19,7 @@ rayTrace h w rv uv n ((Camera o t),objs, lights) (x,y) = let stepX = mul ((tanX 
                                                              stepY = mul (tanY/w) uv
                                       in let dir = t - o + (mul (intToFloat x - h/2) stepX) + (mul (intToFloat y - w/2) stepY)
                                          in let dirs = antiAliasing n stepX stepY dir
-                                            in toColor $ divl (intToFloat $ length dirs) (sum $ [toVec3Df $ brdf objs lights (Ray o (normalize d)) "phong" | d <- dirs])
+                                            in toColor $ divl (intToFloat $ length dirs) (sum $ [brdf objs lights (Ray o (normalize d)) "phong" 0 | d <- dirs])
 
 
                                           --brdf objs lights (Ray o (normalize dir)) 
@@ -54,7 +54,7 @@ setPixels (p:t) f im = do
 main :: Int -> Int -> Integer -> IO()
 main h w n = do
   im <- newImage (h,w)
-  setPixels (getPixels h w) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene2) im
+  setPixels (getPixels h w) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene3) im
   savePngFile "result.png" im
   return ()
 

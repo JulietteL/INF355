@@ -23,6 +23,9 @@ instance Ord Vec3Df where
 dot :: Vec3Df -> Vec3Df -> Float
 dot (Vec3Df x1 y1 z1) (Vec3Df x2 y2 z2) = x1*x2 + y1*y2 + z1*z2
 
+cross :: Vec3Df -> Vec3Df -> Vec3Df
+cross (Vec3Df x1 y1 z1) (Vec3Df x2 y2 z2) = (Vec3Df (y1*z2-z1*y2) (z1*x2-x1*z2) (x1*y2-y1*x2))
+
 mul :: Float -> Vec3Df -> Vec3Df
 mul a (Vec3Df x y z) = Vec3Df (a*x) (a*y) (a*z)
 
@@ -51,4 +54,4 @@ toVec3Df c  = let (r, g, b, _) = toRGBA c
                   in Vec3Df (fromIntegral r) (fromIntegral g) (fromIntegral b)
 
 toColor :: Vec3Df -> Color
-toColor (Vec3Df r g b) = rgb (round $ min 255 r) (round $ min 255 g) (round $ min 255 b) 
+toColor (Vec3Df r g b) = rgb (round $ min 255 r) (round $ min 255 g) (round $ min 255 b)
