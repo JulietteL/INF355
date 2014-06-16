@@ -64,3 +64,6 @@ main h w n = do
   setPixels (getPixels h w) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene) im
   savePngFile "result.png" im
   return ()
+
+main' :: Int -> Int -> IO()
+main' h w = main h w 1  
