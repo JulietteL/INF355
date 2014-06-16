@@ -3,21 +3,20 @@ module RayTracer where
 import Graphics.GD
 import Vector
 import Scene
+import SceneExamples
 import Ray
 import Scene
 import Brdf
 
-mat1 :: Vec3Df ->Material
-mat1 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.9 20
+mat0 :: Vec3Df -> Material
+mat0 c = SpecularMaterial c 1 (Vec3Df 0 0 0) 0 1
 
-createScene :: Scene
-createScene = let cam = Camera (Vec3Df 0 0 (-4)) (Vec3Df 0 0 0)
-                  objs = [Sphere (Vec3Df 0 0 0) 1 (mat1 $ Vec3Df 255 0 0),
-                          Plan (Vec3Df 0 0 1) (Vec3Df 0 0 (-1)) (mat1 $ Vec3Df 0 255 0),
-                          Sphere (Vec3Df 0 (-0.5) (-0.5)) 0.7 (mat1 $ Vec3Df 0 0 255)]
-                  lights = [Light (Vec3Df 0 4 (-4)) (Vec3Df 1 1 1)]
-                  in (cam, objs, lights)
-                     
+mat1 :: Vec3Df ->Material
+mat1 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.3 10
+
+mat2 :: Vec3Df ->Material
+mat2 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.9 50
+
 tanX :: Float -> Float -> Float
 tanX h w = tan (80 * pi/180) * w/h 
 tanY :: Float
@@ -51,6 +50,6 @@ toVec3Df c  = let (r, g, b, _) = toRGBA c
 main :: Int -> Int -> IO()
 main h w = do
   im <- newImage (h,w)
-  setPixels (getPixels h w) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) createScene) im
+  setPixels (getPixels h w) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) createScene2) im
   savePngFile "result.png" im
   return ()
