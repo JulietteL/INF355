@@ -7,11 +7,14 @@ import Ray
 import Scene
 import Brdf
 
+mat1 :: Vec3Df ->Material
+mat1 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.9 20
+
 createScene :: Scene
 createScene = let cam = Camera (Vec3Df 0 0 (-4)) (Vec3Df 0 0 0)
-                  objs = [Sphere (Vec3Df 0 0 0) 1 ( Material (Vec3Df 255 0 0)),
-                          Plan (Vec3Df 0 0 1) (Vec3Df 0 0 (-1)) (Material (Vec3Df 0 255 0)),
-                          Sphere (Vec3Df 0 (-0.5) (-0.5)) 0.7 (Material (Vec3Df 0 0 255))]
+                  objs = [Sphere (Vec3Df 0 0 0) 1 (mat1 $ Vec3Df 255 0 0),
+                          Plan (Vec3Df 0 0 1) (Vec3Df 0 0 (-1)) (mat1 $ Vec3Df 0 255 0),
+                          Sphere (Vec3Df 0 (-0.5) (-0.5)) 0.7 (mat1 $ Vec3Df 0 0 255)]
                   lights = [Light (Vec3Df 0 4 (-4)) (Vec3Df 1 1 1)]
                   in (cam, objs, lights)
                      
@@ -26,7 +29,7 @@ rayTrace h w rv uv n ((Camera o t),objs, lights) (x,y) = let stepX = mul ((tanX 
                                                              stepY = mul (tanY/w) uv
                                       in let dir = t - o + (mul (intToFloat x - h/2) stepX) + (mul (intToFloat y - w/2) stepY)
                                          in let dirs = antiAliasing n stepX stepY dir
-                                            in toColor $ divl (intToFloat $ length dirs) (sum $ [toVec3Df $ brdf objs lights (Ray o (normalize d)) | d <- dirs])
+                                            in toColor $ divl (intToFloat $ length dirs) (sum $ [toVec3Df $ brdf objs lights (Ray o (normalize d)) "phong" | d <- dirs])
 
 
                                           --brdf objs lights (Ray o (normalize dir)) 
@@ -66,4 +69,4 @@ main h w n = do
   return ()
 
 main' :: Int -> Int -> IO()
-main' h w = main h w 1  
+main' h w = main h w 1
