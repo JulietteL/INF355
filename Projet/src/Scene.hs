@@ -15,7 +15,19 @@ getMaterial (Sphere _ _ mat) = mat
 getMaterial (Plan _ _ mat) = mat
 
 -- Lumière : position, couleur
-data Light = Light Vec3Df Vec3Df
+data Light = Light Vec3Df Vec3Df | ExtendedLight Vec3Df Vec3Df Float
+
+getPointsOnLight :: Light -> Int -> [Light]
+getPointsOnLight l 1 = [l]
+getPointsOnLight (Light p c) _ = [Light p c]
+getPointsOnLight l n = let (ExtendedLight p c r) = l
+                       in concat [[Light p c] , getPointsOnLight l $ n-1]
+
+randomPointOnLight :: Light -> Vec3Df
+randomPointOnLight (ExtendedLight p _ r) = let theta  = 3.14
+                                               phi = 1.50
+                                               in Vec3Df theta phi r
+randomPointOnLight (Light p c) = p
 
 type Scene = (Camera, [Object], [Light])
 

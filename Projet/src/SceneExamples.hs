@@ -29,7 +29,7 @@ createScene2 :: Scene
 createScene2 = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
                    objs = [
                      Sphere (Vec3Df 0 0 0) 1 (mat1 $ Vec3Df 255 0 0),
-                     Sphere (Vec3Df 1 3 0) 2 (mat2 $ Vec3Df 30 189 64)
+                     Sphere (Vec3Df 2 2 5) 3 (mat2 $ Vec3Df 30 189 64)
                           ]
-                   lights = [Light (Vec3Df 0 (-0.5) (-4)) (Vec3Df 1 1 1)]
+                   lights = [Light (Vec3Df (-50) 0 (-50)) (Vec3Df 1 1 1)]
                   in (cam, objs, lights)
