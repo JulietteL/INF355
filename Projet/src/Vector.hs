@@ -29,6 +29,12 @@ mul a (Vec3Df x y z) = Vec3Df (a*x) (a*y) (a*z)
 mur :: Vec3Df -> Float -> Vec3Df
 mur v a = mul a v
 
+divl :: Float -> Vec3Df -> Vec3Df
+divl a v = mul (1/a) v
+
+divr :: Vec3Df -> Float -> Vec3Df
+divr v a = mur v (1/a)
+
 squaredNorm :: Vec3Df -> Float
 squaredNorm v = dot v v
 
