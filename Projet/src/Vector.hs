@@ -45,4 +45,4 @@ toVec3Df c  = let (r, g, b, _) = toRGBA c
                   in Vec3Df (fromIntegral r) (fromIntegral g) (fromIntegral b)
 
 toColor :: Vec3Df -> Color
-toColor (Vec3Df r g b) = rgb (round r) (round g) (round b) 
+toColor (Vec3Df r g b) = rgb (round $ min 255 r) (round $ min 255 g) (round $ min 255 b) 

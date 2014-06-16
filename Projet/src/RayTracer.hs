@@ -7,11 +7,14 @@ import Ray
 import Scene
 import Brdf
 
+mat1 :: Vec3Df ->Material
+mat1 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.9 20
+
 createScene :: Scene
 createScene = let cam = Camera (Vec3Df 0 0 (-4)) (Vec3Df 0 0 0)
-                  objs = [Sphere (Vec3Df 0 0 0) 1 ( Material (Vec3Df 255 0 0)),
-                          Plan (Vec3Df 0 0 1) (Vec3Df 0 0 (-1)) (Material (Vec3Df 0 255 0)),
-                          Sphere (Vec3Df 0 (-0.5) (-0.5)) 0.7 (Material (Vec3Df 0 0 255))]
+                  objs = [Sphere (Vec3Df 0 0 0) 1 (mat1 $ Vec3Df 255 0 0),
+                          Plan (Vec3Df 0 0 1) (Vec3Df 0 0 (-1)) (mat1 $ Vec3Df 0 255 0),
+                          Sphere (Vec3Df 0 (-0.5) (-0.5)) 0.7 (mat1 $ Vec3Df 0 0 255)]
                   lights = [Light (Vec3Df 0 4 (-4)) (Vec3Df 1 1 1)]
                   in (cam, objs, lights)
                      
@@ -24,7 +27,7 @@ rayTrace :: Float -> Float -> Vec3Df -> Vec3Df -> Scene -> Point -> Color
 rayTrace h w rv uv ((Camera o t),objs, lights) (x,y) = let stepX = mul ((intToFloat x - h/2)/h * (tanX w h)) rv
                                                            stepY = mul ((intToFloat y - w/2)/w * tanY) uv
                                       in let dir = t - o + stepX + stepY
-                                         in brdf objs lights (Ray o (normalize dir)) 
+                                         in brdf objs lights (Ray o (normalize dir)) "phong" 
 
 intToFloat :: Int -> Float
 intToFloat i = fromInteger $ toInteger i
