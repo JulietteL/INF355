@@ -33,5 +33,5 @@ intersect (Ray o d) (Plan p n _) =
   if (dot d n == 0) then Nothing
   else let t = (1/(dot d n)) * (dot (p-o) n)
        in if (t < 0) then Nothing
-          else Just(o + mul t d, normalize n )
+          else Just(o + mul t d, normalize n)
 
