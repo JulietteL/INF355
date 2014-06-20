@@ -15,7 +15,7 @@ sqDistanceToCam :: Vec3Df -> (Maybe (Vec3Df,Vec3Df), Material) -> Float
 sqDistanceToCam cam (Just (point,normal), _) = squaredNorm $ point - cam
 
 shadowCoeff :: Vec3Df -> Light -> [Object] -> Float
-shadowCoeff pos (Light lp lc) objs = let dir = lp - pos
+shadowCoeff pos (Light lp lc) objs = let dir = normalize $ lp - pos
                                      in let ray = Ray (pos +  (mul 0.01 dir)) dir
                                       in let intList = filter (\x -> isJust x) [intersect ray obj | obj <- objs]
                                          in if null intList
