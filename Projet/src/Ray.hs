@@ -7,6 +7,12 @@ import Scene
 data Ray = Ray Vec3Df Vec3Df
            deriving Show
 
+-- ray intersection(position,normal) --> reflected Ray
+reflectedRay :: Ray -> (Vec3Df, Vec3Df) -> Ray
+reflectedRay (Ray o d) (p,n) = let d' = d - mul (2 * dot n d) n
+                                  in (Ray (p+mul 0.01 n) $ normalize d')
+
+
 intersect :: Ray -> Object -> Maybe (Vec3Df, Vec3Df)
 intersect (Ray o d) (Sphere ce r _) = let
   a = squaredNorm d
@@ -27,5 +33,5 @@ intersect (Ray o d) (Plan p n _) =
   if (dot d n == 0) then Nothing
   else let t = (1/(dot d n)) * (dot (p-o) n)
        in if (t < 0) then Nothing
-          else Just(o + mul t d, normalize n )
+          else Just(o + mul t d, normalize n)
 

@@ -34,7 +34,8 @@ type Scene = (Camera, [Object], [Light])
 -- Material for object
 -- Material : diffuse color
 -- Material : diffuse color, diffuse coeff, specular color, specular coeff, shininess
-data Material = DiffuseMaterial Vec3Df | SpecularMaterial Vec3Df Float Vec3Df Float Float
+-- Material : reflexion coeff, diffuse color, diffuse coeff, specular color, specular coeff, shininess
+data Material = DiffuseMaterial Vec3Df | SpecularMaterial Vec3Df Float Vec3Df Float Float | ReflexiveMaterial Float Vec3Df Float Vec3Df Float Float
 
 getDiffuseColor :: Material -> Vec3Df
 getDiffuseColor (DiffuseMaterial d) = d
@@ -54,3 +55,7 @@ getSpecularCoeff _ = error "no specular coefficient"
 getShininess :: Material -> Float
 getShininess (SpecularMaterial _ _ _ _ sh) = sh
 getShininess _ = error "no shininess coefficient"
+
+getReflexiveCoeff :: Material -> Float
+getReflexiveCoeff (ReflexiveMaterial r _ _ _ _ _) = r
+getReflexiveCoeff _ = 0
