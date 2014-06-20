@@ -30,7 +30,8 @@ brdf objs lights (Ray o d) brdfName i = let intList = filter (\x -> isJust $ fst
 shadowCoeff :: Vec3Df -> Light -> [Object] -> Float
 shadowCoeff pos (Light lp lc) objs = let dir = normalize $ lp - pos
                                      in let ray = Ray (pos +  (mul 0.01 dir)) dir
-                                      in let intList = filter (\x -> isJust x) [intersect ray obj | obj <- objs]
+                                      in let intList = filter (\x -> isJust x && squaredNorm (fst (fromJust x) - pos) < squaredNorm (lp - pos)) [intersect ray obj | obj <- objs]
+                                             
                                          in if null intList
                                             then 1.0
                                             else 0.0
