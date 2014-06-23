@@ -21,12 +21,14 @@ data Light = Light Vec3Df Vec3Df | ExtendedLight Vec3Df Vec3Df Float
 getPointsOnLight :: Light -> Int -> [Float] -> ([Light], [Float])
 getPointsOnLight l 1 list = ([l], list)
 getPointsOnLight (Light p c) _ list = ([Light p c], list)
-getPointsOnLight l n list = let (newPos, newList) = getRandomPointOnLight l list
-                            in (((Light newPos c) : getPointsOnLight l $ n-1), newList) 
+getPointsOnLight (ExtendedLight p c r) n list =
+  let (newPos, newList) = randomPointOnLight (ExtendedLight p c r) list
+      (lights, newList') = getPointsOnLight (ExtendedLight p c r) (n-1) newList
+  in (((Light newPos c) : lights), newList') 
 
 randomPointOnLight :: Light -> [Float] -> (Vec3Df, [Float])
 randomPointOnLight (ExtendedLight p _ r) list = let ([r1, r2], newList) = splitAt 2 list
-                                               in (Vec3Df r1*2*pi r2*pi r, newList)
+                                               in (p + (toCartesian $ Vec3Df r (r1*2*pi) (r2*pi)), newList)
 randomPointOnLight (Light p c) list = (p, list)
 
 type Scene = (Camera, [Object], [Light])

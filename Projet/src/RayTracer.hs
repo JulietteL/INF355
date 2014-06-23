@@ -15,13 +15,14 @@ tanX h w = tan (80 * pi/180) * w/h
 tanY :: Float
 tanY = tan (80 * pi/180)
 
+-- WARNING!! obsolete
 -- rayTrace: randomList height width rightVector upVector antialiasingRays Scene imagePixel -> pixel color
 rayTrace :: Float -> Float -> Vec3Df -> Vec3Df -> Integer -> Scene -> Point -> Color
 rayTrace h w rv uv n ((Camera o t),objs, lights) (x,y) = let stepX = mul ((tanX w h)/h) rv
                                                              stepY = mul (tanY/w) uv
                                       in let dir = t - o + (mul (intToFloat x - h/2) stepX) + (mul (intToFloat y - w/2) stepY)
                                          in let dirs = antiAliasing n stepX stepY dir
-                                            in toColor $ divl (intToFloat $ length dirs) (sum $ [brdf objs lights (Ray o (normalize d)) "phong" 0 | d <- dirs])
+                                            in toColor $ divl (intToFloat $ length dirs) (sum $ [fst $brdf objs lights (Ray o (normalize d)) "phong" 0 []| d <- dirs])
 
 -- rayTrace: randomList height width rightVector upVector antialiasingRays Scene imagePixel -> pixel color
 rayTrace' :: Float -> Float -> Vec3Df -> Vec3Df -> Integer -> Scene -> [Float] -> Point -> (Color, [Float])
@@ -29,7 +30,9 @@ rayTrace' h w rv uv n ((Camera o t),objs, lights) randomList (x,y) = let stepX =
                                                                          stepY = mul (tanY/w) uv
                                       in let dir = t - o + (mul (intToFloat x - h/2) stepX) + (mul (intToFloat y - w/2) stepY)
                                          in let (dirs,rlist) = randomAL randomList n stepX stepY dir
-                                            in (toColor $ divl (intToFloat $ length dirs) (sum $ [brdf objs lights (Ray o (normalize d)) "phong" 0 | d <- dirs]), rlist)
+                                                rays = [(Ray o (normalize d)) | d <- dirs]
+                                                (color,rlist') = brdfs objs lights rays "phong" 0 rlist
+                                            in (toColor color, rlist')
 
 
 
@@ -100,20 +103,9 @@ take' i1 i2 l = take (i2 - i1) $ drop i1 l
 main :: Int -> Int -> Integer -> IO()
 main h w n = do
   im <- newImage (h,w)
-  setPixels (getPixels h w) (rayTrace (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene3) im
-  savePngFile "result.png" im
-  return ()
-
-main' :: Int -> Int -> IO()
-main' h w = main h w 1
-
-main'' :: Int -> Int -> Integer -> IO()
-main'' h w n = do
-  im <- newImage (h,w)
   gen <- getStdGen
   ;let l = randomRs (0, 1) gen
-  setPixels' (getPixels h w) l (rayTrace' (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene3) im
+  setPixels' (getPixels h w) l (rayTrace' (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene2) im
   savePngFile "result.png" im
   return ()
-  
 --  putStrLn $ show $ fst $ randomAL 5 l

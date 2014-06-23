@@ -55,3 +55,6 @@ toVec3Df c  = let (r, g, b, _) = toRGBA c
 
 toColor :: Vec3Df -> Color
 toColor (Vec3Df r g b) = rgb (round $ min 255 r) (round $ min 255 g) (round $ min 255 b)
+
+toCartesian :: Vec3Df -> Vec3Df
+toCartesian (Vec3Df r phi theta) = Vec3Df (r*sin(phi)*cos(theta)) (r*sin(phi)*sin(theta)) (r*cos(phi))
