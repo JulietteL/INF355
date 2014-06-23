@@ -102,7 +102,7 @@ main h w n = do
   im <- newImage (h,w)
   gen <- getStdGen
   ;let l = randomRs (0, 1) gen
-  setPixels' (getPixels h w) l (rayTrace' (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene2) im
+  setPixels' (getPixels h w) l (rayTrace' (intToFloat h) (intToFloat w) (Vec3Df 1 0 0) (Vec3Df 0 1 0) n createScene) im
   savePngFile "result.png" im
   return ()
 --  putStrLn $ show $ fst $ randomAL 5 l

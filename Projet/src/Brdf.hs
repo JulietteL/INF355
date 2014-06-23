@@ -67,4 +67,11 @@ brdf'' ((p, n), (SpecularMaterial d kd s ks sh)) (ExtendedLight lp lc r) cam "ph
       sc = (sum $ fmap (\x -> shadowCoeff p x objs) lights')/4
   in (mul sc $ ((mul (kd * (max 0 $ dot (normalize $ lp-p) n)) d)
                + mul (ks * (max 0 $ dot h n) ** sh) s) * lc, random')
+brdf'' ((p, n), (SpecularMaterial d kd s ks sh)) (Light lp lc) cam "phong" objs random =
+  let h = normalize $ (normalize (lp - p)) + (normalize (cam - p))
+      sc = shadowCoeff p (Light lp lc) objs
+  in (mul sc $ ((mul (kd * (max 0 $ dot (normalize $ lp-p) n)) d)
+               + mul (ks * (max 0 $ dot h n) ** sh) s) * lc, random)
+
+-- WARNING : should not exist
 brdf'' _ _ _ _ _ rList = (Vec3Df 0.0 0.0 255.0, rList)

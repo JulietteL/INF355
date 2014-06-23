@@ -12,7 +12,7 @@ mat0 c = SpecularMaterial c 1 (Vec3Df 0 0 0) 0 1
 mat1 :: Vec3Df ->Material
 mat1 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.3 10
 
-mat2 :: Vec3Df ->Material
+mat2 :: Vec3Df -> Material
 mat2 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.9 50
 
 mat3 :: Float -> Vec3Df -> Material
