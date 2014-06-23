@@ -62,9 +62,10 @@ brdf' _ _ _ _ _ _ = error "no such BRDF"
 
 brdf'' :: ((Vec3Df, Vec3Df), Material) -> Light -> Vec3Df -> String -> [Object] -> [Float] -> (Vec3Df, [Float])
 brdf'' ((p, n), (SpecularMaterial d kd s ks sh)) (ExtendedLight lp lc r) cam "phong" objs random =
-  let h = normalize $ (normalize (lp - p)) + (normalize (cam - p))
-      (lights', random') = getPointsOnLight (ExtendedLight lp lc r) 4 random
-      sc = (sum $ fmap (\x -> shadowCoeff p x objs) lights')/4
+  let nbPoints = 16
+      h = normalize $ (normalize (lp - p)) + (normalize (cam - p))
+      (lights', random') = getPointsOnLight (ExtendedLight lp lc r) nbPoints random
+      sc = (sum $ fmap (\x -> shadowCoeff p x objs) lights')/(fromIntegral nbPoints)
   in (mul sc $ ((mul (kd * (max 0 $ dot (normalize $ lp-p) n)) d)
                + mul (ks * (max 0 $ dot h n) ** sh) s) * lc, random')
 brdf'' _ _ _ _ _ rList = (Vec3Df 0.0 0.0 255.0, rList)
