@@ -16,24 +16,25 @@ sqDistanceToCam cam (Just (point,normal), _) = squaredNorm $ point - cam
 
 brdfs :: [Object] -> [Light] -> [Ray] -> String -> Int -> [Float] -> (Vec3Df, [Float])
 brdfs objs lights [] brdfName i rlist = (0, rlist)
-brdfs objs lights (ray:t) brdfName i rlist = let (c,rlist') = brdf objs ray lights brdfName i rlist
-                                                 (c',rlist'') = brdfs objs t lights brdfName i rlist'
+brdfs objs lights (ray:t) brdfName i rlist = let (c,rlist') = brdf objs lights ray brdfName i rlist
+                                                 (c',rlist'') = brdfs objs lights t  brdfName i rlist'
                                              in (c+c', rlist'') 
 
-brdf :: [Object] -> [Light] -> Ray -> String -> Int -> Vec3Df
-brdf objs lights (Ray o d) brdfName i = let intList = filter (\x -> isJust $ fst x) [(intersect (Ray o d) obj, getMaterial(obj)) | obj <- objs ]
+brdf :: [Object] -> [Light] -> Ray -> String -> Int -> [Float] -> (Vec3Df, [Float])
+brdf objs lights (Ray o d) brdfName i rList= let intList = filter (\x -> isJust $ fst x) [(intersect (Ray o d) obj, getMaterial(obj)) | obj <- objs ]
                       in if null intList
-                         then bgColor
+                         then (bgColor, rList)
                          else let
                            ((p, n), mat) = ((\r -> (fromJust $ fst r, snd r)) (minimumBy (comparing (sqDistanceToCam o)) intList))
-                           brdf1 = brdf' ((p,n), mat) lights o brdfName objs
+                           (brdf1, rList') = brdf' ((p,n), mat) lights o brdfName objs rList
                               in if getReflexiveCoeff mat == 0
-                                 then brdf1 
+                                 then (brdf1, rList') 
                                  else if i < 5
-                                      then mul (getReflexiveCoeff mat) (brdf objs lights (reflectedRay (Ray o d) (p,n)) brdfName (i+1)) + mul (1-getReflexiveCoeff mat) brdf1
-                                      else brdf1
+                                      then (mul (getReflexiveCoeff mat) (fst $ brdf objs lights (reflectedRay (Ray o d) (p,n)) brdfName (i+1) rList') + mul (1-getReflexiveCoeff mat) brdf1, rList')
+                                      else (brdf1, rList')
                                            
 shadowCoeff :: Vec3Df -> Light -> [Object] -> Float
+shadowCoeff pos (ExtendedLight lp lc _) objs = shadowCoeff pos (Light lp lc) objs
 shadowCoeff pos (Light lp lc) objs = let dir = normalize $ lp - pos
                                      in let ray = Ray (pos +  (mul 0.01 dir)) dir
                                       in let intList = filter (\x -> isJust x && squaredNorm (fst (fromJust x) - pos) < squaredNorm (lp - pos)) [intersect ray obj | obj <- objs]
@@ -43,22 +44,27 @@ shadowCoeff pos (Light lp lc) objs = let dir = normalize $ lp - pos
                                             else 0.0
                                                  
 -- brdf : (pt intersection, normale au pt d'intersection, matériau), lumières, position de la caméra -> Couleur 
-brdf' :: ((Vec3Df, Vec3Df), Material) -> [Light] -> Vec3Df -> String -> [Object] -> Vec3Df
+brdf' :: ((Vec3Df, Vec3Df), Material) -> [Light] -> Vec3Df -> String -> [Object] -> [Float] -> (Vec3Df, [Float])
 -- Lambert
-brdf' ((p, n), mat) lights _ "lambert" _ = sum $ fmap (\(Light lp lc) -> mul (max 0 $ dot (normalize (lp-p)) n) ( lc * getDiffuseColor mat)) lights
+brdf' ((p, n), mat) lights _ "lambert" _ random = (sum $ fmap (\(Light lp lc) -> mul (max 0 $ dot (normalize (lp-p)) n) ( lc * getDiffuseColor mat)) lights, random)
 -- Phong
-brdf' ((p, n), (SpecularMaterial d kd s ks sh)) lights cam "phong" objs =
-  sum $ fmap (\(Light lp lc) -> let  h = normalize $ (normalize (lp - p)) + (normalize (cam - p))
-                                     sc = shadowCoeff p (Light lp lc) objs
-                                in mul sc $ ((mul (kd * (max 0 $ dot (normalize $ lp-p) n)) d)
-                                    + mul (ks * (max 0 $ dot h n) ** sh) s) * lc
-             )
-  lights
-  
+brdf' u [light] cam "phong" objs random  = brdf'' u light cam "phong" objs random
+brdf' u (light:otherLights) cam "phong" objs random =
+  let (c, random') = brdf'' u light cam "phong" objs random
+      (c', random'') = brdf' u otherLights cam "phong" objs random'
+  in (c + c', random'')            
 -- Reflexive
-brdf' ((p, n), (ReflexiveMaterial f d kd s ks sh)) lights cam "phong" objs =
-  brdf' ((p, n), (SpecularMaterial d kd s ks sh)) lights cam "phong" objs
+brdf' ((p, n), (ReflexiveMaterial f d kd s ks sh)) lights cam "phong" objs random =
+  brdf' ((p, n), (SpecularMaterial d kd s ks sh)) lights cam "phong" objs random
   
-brdf' _ _ _ "phong"_ = error "object's material is not of type SpecularMaterial"
-brdf' _ _ _ _ _ = error "no such BRDF"
+brdf' _ _ _ "phong"_ _ = error "object's material is not of type SpecularMaterial"
+brdf' _ _ _ _ _ _ = error "no such BRDF"
 
+brdf'' :: ((Vec3Df, Vec3Df), Material) -> Light -> Vec3Df -> String -> [Object] -> [Float] -> (Vec3Df, [Float])
+brdf'' ((p, n), (SpecularMaterial d kd s ks sh)) (ExtendedLight lp lc r) cam "phong" objs random =
+  let h = normalize $ (normalize (lp - p)) + (normalize (cam - p))
+      (lights', random') = getPointsOnLight (ExtendedLight lp lc r) 4 random
+      sc = (sum $ fmap (\x -> shadowCoeff p x objs) lights')/4
+  in (mul sc $ ((mul (kd * (max 0 $ dot (normalize $ lp-p) n)) d)
+               + mul (ks * (max 0 $ dot h n) ** sh) s) * lc, random')
+brdf'' _ _ _ _ _ rList = (Vec3Df 0.0 0.0 255.0, rList)

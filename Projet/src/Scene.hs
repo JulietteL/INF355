@@ -1,3 +1,4 @@
+
 module Scene where
 
 import  Vector
@@ -17,17 +18,18 @@ getMaterial (Plan _ _ mat) = mat
 -- Lumière : position, couleur
 data Light = Light Vec3Df Vec3Df | ExtendedLight Vec3Df Vec3Df Float
 
-getPointsOnLight :: Light -> Int -> [Light]
-getPointsOnLight l 1 = [l]
-getPointsOnLight (Light p c) _ = [Light p c]
-getPointsOnLight l n = let (ExtendedLight p c r) = l
-                       in concat [[Light p c] , getPointsOnLight l $ n-1]
+getPointsOnLight :: Light -> Int -> [Float] -> ([Light], [Float])
+getPointsOnLight l 1 list = ([l], list)
+getPointsOnLight (Light p c) _ list = ([Light p c], list)
+getPointsOnLight (ExtendedLight p c r) n list =
+  let (newPos, newList) = randomPointOnLight (ExtendedLight p c r) list
+      (lights, newList') = getPointsOnLight (ExtendedLight p c r) (n-1) newList
+  in (((Light newPos c) : lights), newList') 
 
-randomPointOnLight :: Light -> Vec3Df
-randomPointOnLight (ExtendedLight p _ r) = let theta  = 3.14
-                                               phi = 1.50
-                                               in Vec3Df theta phi r
-randomPointOnLight (Light p c) = p
+randomPointOnLight :: Light -> [Float] -> (Vec3Df, [Float])
+randomPointOnLight (ExtendedLight p _ r) list = let ([r1, r2], newList) = splitAt 2 list
+                                               in (p + (toCartesian $ Vec3Df r (r1*2*pi) (r2*pi)), newList)
+randomPointOnLight (Light p c) list = (p, list)
 
 type Scene = (Camera, [Object], [Light])
 
