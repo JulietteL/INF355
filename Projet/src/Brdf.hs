@@ -37,18 +37,24 @@ shadowCoeff pos (Light lp lc) objs = let dir = normalize $ lp - pos
                                             else 0.0
                                                  
 -- brdf : (pt intersection, normale au pt d'intersection, matériau), lumières, position de la caméra -> Couleur 
-brdf' :: ((Vec3Df, Vec3Df), Material) -> [Light] -> Vec3Df -> String -> [Object] -> Vec3Df
+brdf' :: ((Vec3Df, Vec3Df), Material) -> [Light] -> Vec3Df -> String -> [Object] -> [Float] -> (Vec3Df, [Float])
 -- Lambert
-brdf' ((p, n), mat) lights _ "lambert" _ = sum $ fmap (\(Light lp lc) -> mul (max 0 $ dot (normalize (lp-p)) n) ( lc * getDiffuseColor mat)) lights
+brdf' ((p, n), mat) lights _ "lambert" _ random = (sum $ fmap (\(Light lp lc) -> mul (max 0 $ dot (normalize (lp-p)) n) ( lc * getDiffuseColor mat)) lights, random)
 -- Phong
-brdf' ((p, n), (SpecularMaterial d kd s ks sh)) lights cam "phong" objs =
-  sum $ fmap (\(Light lp lc) -> let  h = normalize $ (normalize (lp - p)) + (normalize (cam - p))
-                                     sc = shadowCoeff p (Light lp lc) objs
-                                in mul sc $ ((mul (kd * (max 0 $ dot (normalize $ lp-p) n)) d)
-                                    + mul (ks * (max 0 $ dot h n) ** sh) s) * lc
-             )
-  lights
-  
+brdf' u light cam "phong" objs random  = brdf'' u light cam "phong" objs random
+brdf' u (light:otherLights) cam "phong" objs random =
+  let (c, random') = brdf'' u light cam "phong" objs random
+      (c', random'') = brdf' u otherLights cam "phong" objs random'
+  in (c + c', random'')
+
+brdf'' :: ((Vec3Df, Vec3Df), Material) -> Light -> Vec3Df -> String -> [Object] -> [Float] -> (Vec3Df, [Float])
+brdf'' ((p, n), (SpecularMaterial d kd s ks sh)) (Light lp lc) cam "phong" objs random =
+  let h = normalize $ (normalize (lp - p)) + (normalize (cam - p))
+      (lights', random') = getPointsOnLight (Light lp lc) 4 random
+      sc = sum $ fmap (\x -> shadowCoeff p x objs) lights'
+  in (mul sc $ ((mul (kd * (max 0 $ dot (normalize $ lp-p) n)) d)
+               + mul (ks * (max 0 $ dot h n) ** sh) s) * lc, random')
+            
 -- Reflexive
 brdf' ((p, n), (ReflexiveMaterial f d kd s ks sh)) lights cam "phong" objs =
   brdf' ((p, n), (SpecularMaterial d kd s ks sh)) lights cam "phong" objs
