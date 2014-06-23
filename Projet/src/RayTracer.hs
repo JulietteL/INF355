@@ -60,16 +60,6 @@ randomAL rlist n stepX stepY dir = let stepx = mul 0.5 stepX
                                   else let (tuples, rlist2) = listRandomTuples n rlist 
                                        in (map (\t -> dir + mul (fst t * 2 - 1) stepx + mul (snd t * 2 - 1) stepy) tuples, rlist2)
 
-
--- n: number of tuples
--- l: infinite randomList
--- returns list of tuples the rest of the infinite randomList
-listRandomTuples :: Integer -> [Float] -> ([(Float,Float)],[Float])
-listRandomTuples n l = let sp = splitAt (2 * fromInteger n) l
-                           sp1 = splitAt (fromInteger n) (fst sp)
-                       in (zip (fst sp1) (snd sp1), snd sp)
-
-
                                      
 intToFloat :: Int -> Float
 intToFloat i = fromInteger $ toInteger i

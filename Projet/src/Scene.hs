@@ -18,18 +18,19 @@ getMaterial (Plan _ _ mat) = mat
 -- Lumière : position, couleur
 data Light = Light Vec3Df Vec3Df | ExtendedLight Vec3Df Vec3Df Float
 
-getPointsOnLight :: Light -> Int -> [Float] -> ([Light], [Float])
-getPointsOnLight l 1 list = ([l], list)
-getPointsOnLight (Light p c) _ list = ([Light p c], list)
-getPointsOnLight (ExtendedLight p c r) n list =
-  let (newPos, newList) = randomPointOnLight (ExtendedLight p c r) list
-      (lights, newList') = getPointsOnLight (ExtendedLight p c r) (n-1) newList
-  in (((Light newPos c) : lights), newList') 
+-- n: number of tuples
+-- l: infinite randomList
+-- returns list of tuples the rest of the infinite randomList
+listRandomTuples :: Integer -> [Float] -> ([(Float,Float)],[Float])
+listRandomTuples n l = let sp = splitAt (2 * fromInteger n) l
+                           sp1 = splitAt (fromInteger n) (fst sp)
+                       in (zip (fst sp1) (snd sp1), snd sp)
 
-randomPointOnLight :: Light -> [Float] -> (Vec3Df, [Float])
-randomPointOnLight (ExtendedLight p _ r) list = let ([r1, r2], newList) = splitAt 2 list
-                                               in (p + (toCartesian $ Vec3Df r (r1*2*pi) (r2*pi)), newList)
-randomPointOnLight (Light p c) list = (p, list)
+
+getPointsOnLight :: Light -> Int -> [Float] -> ([Light], [Float])
+getPointsOnLight (Light p c) _ list = ([Light p c], list)
+getPointsOnLight (ExtendedLight p c r) n list = let (tuples,list') = listRandomTuples (fromIntegral n) list
+                                                in (map (\x -> (Light (p + toCartesian (Vec3Df r (fst x * 2*pi) (snd x * pi))) c)) tuples, list')
 
 type Scene = (Camera, [Object], [Light])
 
