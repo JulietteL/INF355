@@ -42,7 +42,7 @@ createScene3 = let cam = Camera (Vec3Df 3 0 (-10)) (Vec3Df 0 0 0)
                    objs = [
                      Sphere (Vec3Df 0 0 0) 1 (mat1 $ Vec3Df 255 0 0),
                      --Plan (Vec3Df 4 0 0) (Vec3Df (-1) 0 0) (mat3 1 $ Vec3Df 0 255 0)
-                     Plan (Vec3Df (-1) 0 0) (Vec3Df 1 0 0) (mat3 0 $ Vec3Df 0 255 0)
+                     Plan (Vec3Df (-1) 0 0) (Vec3Df 1 0 0) (mat3 0.8 $ Vec3Df 0 255 0)
                           ]
                    lights = [Light (Vec3Df 0 5 (-4)) (Vec3Df 1 1 1)]
                   in (cam, objs, lights)
