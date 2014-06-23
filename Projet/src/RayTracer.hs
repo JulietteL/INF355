@@ -31,8 +31,8 @@ rayTrace' h w rv uv n ((Camera o t),objs, lights) randomList (x,y) = let stepX =
                                       in let dir = t - o + (mul (intToFloat x - h/2) stepX) + (mul (intToFloat y - w/2) stepY)
                                          in let (dirs,rlist) = randomAL randomList n stepX stepY dir
                                                 rays = [(Ray o (normalize d)) | d <- dirs]
-                                                (color,rlist') = brdfs objs lights rays "phong" 0 rlist
-                                            in (toColor color, rlist')
+                                                (color,rlist') = brdfs objs lights rays "phong" rlist
+                                            in (toColor $ divl (fromInteger n) color, rlist')
 
 
 

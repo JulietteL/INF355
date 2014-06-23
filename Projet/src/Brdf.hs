@@ -14,10 +14,10 @@ bgColor = (Vec3Df 10 10 10)
 sqDistanceToCam :: Vec3Df -> (Maybe (Vec3Df,Vec3Df), Material) -> Float
 sqDistanceToCam cam (Just (point,normal), _) = squaredNorm $ point - cam
 
-brdfs :: [Object] -> [Light] -> [Ray] -> String -> Int -> [Float] -> (Vec3Df, [Float])
-brdfs objs lights [] brdfName i rlist = (0, rlist)
-brdfs objs lights (ray:t) brdfName i rlist = let (c,rlist') = brdf objs lights ray brdfName i rlist
-                                                 (c',rlist'') = brdfs objs lights t  brdfName i rlist'
+brdfs :: [Object] -> [Light] -> [Ray] -> String -> [Float] -> (Vec3Df, [Float])
+brdfs objs lights [] brdfName rlist = (0, rlist)
+brdfs objs lights (ray:t) brdfName rlist = let (c,rlist') = brdf objs lights ray brdfName 0 rlist
+                                               (c',rlist'') = brdfs objs lights t brdfName rlist'
                                              in (c+c', rlist'') 
 
 brdf :: [Object] -> [Light] -> Ray -> String -> Int -> [Float] -> (Vec3Df, [Float])
