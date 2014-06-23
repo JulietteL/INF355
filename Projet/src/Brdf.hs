@@ -13,7 +13,13 @@ bgColor = (Vec3Df 10 10 10)
 
 sqDistanceToCam :: Vec3Df -> (Maybe (Vec3Df,Vec3Df), Material) -> Float
 sqDistanceToCam cam (Just (point,normal), _) = squaredNorm $ point - cam
-                      
+
+brdfs :: [Object] -> [Light] -> [Ray] -> String -> Int -> [Float] -> (Vec3Df, [Float])
+brdfs objs lights [] brdfName i rlist = (0, rlist)
+brdfs objs lights (ray:t) brdfName i rlist = let (c,rlist') = brdf objs ray lights brdfName i rlist
+                                                 (c',rlist'') = brdfs objs t lights brdfName i rlist'
+                                             in (c+c', rlist'') 
+
 brdf :: [Object] -> [Light] -> Ray -> String -> Int -> Vec3Df
 brdf objs lights (Ray o d) brdfName i = let intList = filter (\x -> isJust $ fst x) [(intersect (Ray o d) obj, getMaterial(obj)) | obj <- objs ]
                       in if null intList
