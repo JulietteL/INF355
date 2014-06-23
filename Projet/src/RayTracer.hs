@@ -31,8 +31,8 @@ rayTrace' h w rv uv n ((Camera o t),objs, lights) randomList (x,y) = let stepX =
                                       in let dir = t - o + (mul (intToFloat x - h/2) stepX) + (mul (intToFloat y - w/2) stepY)
                                          in let (dirs,rlist) = randomAL randomList n stepX stepY dir
                                                 rays = [(Ray o (normalize d)) | d <- dirs]
-                                                (color,rlist') = brdfs objs lights rays "phong" 0 rlist
-                                            in (toColor color, rlist')
+                                                (color,rlist') = brdfs objs lights rays "phong" rlist
+                                            in (toColor $ divl (fromInteger n) color, rlist')
 
 
 
@@ -58,7 +58,7 @@ randomAL rlist n stepX stepY dir = let stepx = mul 0.5 stepX
                                   if n == 1
                                   then ([dir],rlist)
                                   else let (tuples, rlist2) = listRandomTuples n rlist 
-                                       in (map (\t -> dir + mul (fst t) stepx + mul (snd t) stepy) tuples, rlist2)
+                                       in (map (\t -> dir + mul (fst t * 2 - 1) stepx + mul (snd t * 2 - 1) stepy) tuples, rlist2)
 
 
 -- n: number of tuples
@@ -67,10 +67,7 @@ randomAL rlist n stepX stepY dir = let stepx = mul 0.5 stepX
 listRandomTuples :: Integer -> [Float] -> ([(Float,Float)],[Float])
 listRandomTuples n l = let sp = splitAt (2 * fromInteger n) l
                            sp1 = splitAt (fromInteger n) (fst sp)
-                           f = (\x -> -1 + 2 * x)
-                           l1 = map f (fst sp1)
-                           l2 = map f (snd sp1)
-                       in (zip l1 l2, snd sp)
+                       in (zip (fst sp1) (snd sp1), snd sp)
 
 
                                      
