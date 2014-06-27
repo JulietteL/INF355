@@ -3,6 +3,8 @@ module Vector where
 import Graphics.GD
 
 type Vec3Di =  (Int, Int, Int)
+
+-- Vector data type for basic geometry operations
 data Vec3Df = Vec3Df Float Float Float
               deriving Show
 

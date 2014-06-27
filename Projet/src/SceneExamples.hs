@@ -6,19 +6,30 @@ import Vector
 -- Materials examples
 
 -- Material of type specular with no specularity
+-- Param : color
 mat0 :: Vec3Df -> Material
 mat0 c = SpecularMaterial c 1 (Vec3Df 0 0 0) 0 1
 
+-- Low specularity
+-- Param : color
 mat1 :: Vec3Df ->Material
 mat1 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.3 10
 
+-- High specularity
+-- Param : color
 mat2 :: Vec3Df -> Material
 mat2 c = SpecularMaterial c 1 (Vec3Df 255 255 255) 0.9 50
 
+-- Reflexive material
+-- Params : reflexive coeff, color
 mat3 :: Float -> Vec3Df -> Material
 mat3 f c = ReflexiveMaterial f c 1 (Vec3Df 255 255 255) 0.9 5
 
+
 -- Scenes
+-- Material colors are defined with [0, 255] values
+-- Light colors are defined with [0, 1] values
+
 createScene :: Scene
 createScene = let cam = Camera (Vec3Df 0 0 (-4)) (Vec3Df 0 0 0)
                   objs = [Sphere (Vec3Df 0 0 0) 1 (mat1 $ Vec3Df 255 0 0),
@@ -27,7 +38,7 @@ createScene = let cam = Camera (Vec3Df 0 0 (-4)) (Vec3Df 0 0 0)
                   lights = [Light (Vec3Df 0 4 (-4)) (Vec3Df 1 1 1)]
                   in (cam, objs, lights)
 
-
+-- soft shadows test
 createScene2 :: Scene
 createScene2 = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
                    objs = [
@@ -41,6 +52,7 @@ createScene2 = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
                      ]
                   in (cam, objs, lights)
 
+-- mirror basic test
 createScene3 :: Scene
 createScene3 = let cam = Camera (Vec3Df 3 0 (-10)) (Vec3Df 0 0 0)
                    objs = [
@@ -51,6 +63,7 @@ createScene3 = let cam = Camera (Vec3Df 3 0 (-10)) (Vec3Df 0 0 0)
                    lights = [Light (Vec3Df 0 5 (-4)) (Vec3Df 1 1 1)]
                   in (cam, objs, lights)
 
+-- 2 lights and some mirrors
 createScene4 :: Scene
 createScene4 = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
                    objs = [
@@ -65,7 +78,8 @@ createScene4 = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
                      ExtendedLight (Vec3Df 50 0 (-30)) (Vec3Df 0.5 0.8 1) 2
                      ]
                   in (cam, objs, lights)
-                  
+
+-- Lots of mirrors
 createScene5 :: Scene
 createScene5 = let cam = Camera (Vec3Df 0 0 (-10)) (Vec3Df 0 0 0)
                    r = 1.0

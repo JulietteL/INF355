@@ -6,7 +6,7 @@ import  Vector
 -- Camera position target
 data Camera = Camera Vec3Df Vec3Df
 
---Objects types to be rendered :
+-- Objects types to be rendered :
 -- Sphere : center, radius
 -- Plan : point, normal
 data Object = Sphere Vec3Df Float Material | Plan Vec3Df Vec3Df Material
@@ -15,9 +15,10 @@ getMaterial :: Object -> Material
 getMaterial (Sphere _ _ mat) = mat
 getMaterial (Plan _ _ mat) = mat
 
--- Lumière : position, couleur
+-- Light : position, color
 data Light = Light Vec3Df Vec3Df | ExtendedLight Vec3Df Vec3Df Float
 
+-- Utility function
 -- n: number of tuples
 -- l: infinite randomList
 -- returns list of tuples the rest of the infinite randomList
@@ -27,6 +28,9 @@ listRandomTuples n l = let sp = splitAt (2 * fromInteger n) l
                        in (zip (fst sp1) (snd sp1), snd sp)
 
 
+-- Get random points on a spherical extended light
+-- Parameters : light, number of points, random numbers list
+-- Return : (set of points described as punctual lights, tail of the random numbers' list)
 getPointsOnLight :: Light -> Int -> [Float] -> ([Light], [Float])
 getPointsOnLight (Light p c) _ list = ([Light p c], list)
 getPointsOnLight (ExtendedLight p c r) n list = let (tuples,list') = listRandomTuples (fromIntegral n) list
