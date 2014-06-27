@@ -16,7 +16,7 @@ bgColor = (Vec3Df 10 10 10)
 
 -- Activate shadows
 shadows :: Bool
-shadows = False
+shadows = True
 
 -- Number of rays casted to extended lights (soft shadow)
 shadowRays :: Int
