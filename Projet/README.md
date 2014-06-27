@@ -7,8 +7,11 @@ This is a basic Raytracer written in Haskell language.
 ##Features##
 
 Basic primitives : spheres and plans
+
 Diffuse, specular and reflexive materials
+
 Hard and soft shadows 
+
 Antialiasing
 
 ##Usage##
